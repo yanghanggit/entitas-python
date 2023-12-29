@@ -134,7 +134,10 @@ class Processors(InitializeProcessor, ExecuteProcessor,
 
     def clear_reactive_processors(self):
         for processor in self._execute_processors:
-            if issubclass(processor, ReactiveProcessor):
+            # if issubclass(type(processor), ReactiveProcessor):
+            #     processor.clear()
+            
+            if isinstance(processor, ReactiveProcessor):
                 processor.clear()
 
             if isinstance(processor, Processors):

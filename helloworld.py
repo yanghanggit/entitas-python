@@ -9,7 +9,8 @@ print('hello python!')
 全局变量
 '''
 running = True
-context = Context()
+frame_duration = 1 / 30  # 每帧所需时间（30帧每秒）
+
 
 '''
 全局函数
@@ -21,8 +22,9 @@ def stop_running():
 '''
 components
 '''
-EmptyComponent = namedtuple('EmptyComponent', 'name index')
-
+Position = namedtuple('Position', 'x y')
+Health = namedtuple('Health', 'value')
+Movable = namedtuple('Movable', '')
 
 '''
 MyInitializeProcessor
@@ -33,8 +35,7 @@ class MyInitializeProcessor(InitializeProcessor):
         self._context = context
       
     def initialize(self):
-        entity = self._context.create_entity()
-        entity.add(EmptyComponent, 'empty', 1024)
+        print('MyInitializeProcessor')
 
 '''
 MyExecuteProcessor
@@ -43,46 +44,53 @@ class MyExecuteProcessor(ExecuteProcessor):
 
     def __init__(self, context):
         self._context = context
+        self._execute_count = 0
        
     def execute(self):
-        return
-        #print('MyExecuteProcessor = ')
+        self._execute_count += 1
+        print('MyExecuteProcessor = ', self._execute_count)
+        if (self._execute_count > 30):
+            stop_running()
 
 
 '''
 MyReactiveProcessor
 '''
-class MyReactiveProcessor(ReactiveProcessor):
+# class MyReactiveProcessor(ReactiveProcessor):
 
-    def __init__(self, context):
-        super().__init__(context)
-        self._context = context
+#     def __init__(self, context):
+#         super().__init__(context)
+#         self._context = context
 
-    def get_trigger(self):
-        return {Matcher(EmptyComponent): GroupEvent.ADDED}
+#     def get_trigger(self):
+#         return {Matcher(Position): GroupEvent.ADDED}
 
-    def filter(self, entity):
-        return entity.has(EmptyComponent)
+#     def filter(self, entity):
+#         return entity.has(Position)
 
-    def react(self, entities):
-        for entity in entities:
-            print(entity.get(EmptyComponent).name)
-            print(entity.get(EmptyComponent).index)
+#     def react(self, entities):
+#         for entity in entities:
+#             print('111111')
+#             #print(entity.get(EmptyComponent).name)
+#             # print(entity.get(EmptyComponent).index)
            
 
 '''
-正式执行
+执行核心区间
 '''
 print("game start!!!!!")
 
+
+context = Context()
+
 processors = Processors()
 processors.add(MyInitializeProcessor(context))
-processors.add(MyReactiveProcessor(context))
 processors.add(MyExecuteProcessor(context))
+
 processors.initialize()
 processors.activate_reactive_processors()
 
-frame_duration = 1 / 30  # 每帧所需时间（30帧每秒）
+
 while running:
 
     start_time = time.time()  # 获取当前时间
