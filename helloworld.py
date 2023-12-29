@@ -11,7 +11,6 @@ print('hello python!')
 running = True
 frame_duration = 1 / 30  # 每帧所需时间（30帧每秒）
 
-
 '''
 全局函数
 '''
@@ -48,49 +47,62 @@ class MyExecuteProcessor(ExecuteProcessor):
        
     def execute(self):
         self._execute_count += 1
-        print('MyExecuteProcessor = ', self._execute_count)
-        if (self._execute_count > 30):
+        if self._execute_count == 10:
             stop_running()
-
 
 '''
 MyReactiveProcessor
 '''
-# class MyReactiveProcessor(ReactiveProcessor):
+class MyReactiveProcessor(ReactiveProcessor):
 
-#     def __init__(self, context):
-#         super().__init__(context)
-#         self._context = context
+    def __init__(self, context):
+        super().__init__(context)
+        self._context = context
 
-#     def get_trigger(self):
-#         return {Matcher(Position): GroupEvent.ADDED}
+    def get_trigger(self):
+        return {Matcher(Movable): GroupEvent.ADDED}
 
-#     def filter(self, entity):
-#         return entity.has(Position)
+    def filter(self, entity):
+        return entity.has(Movable)
 
-#     def react(self, entities):
-#         for entity in entities:
-#             print('111111')
-#             #print(entity.get(EmptyComponent).name)
-#             # print(entity.get(EmptyComponent).index)
+    def react(self, entities):
+        for entity in entities:
+            print('x = ', entity.get(Position).x)
+            print('y = ', entity.get(Position).y)
            
 
 '''
 执行核心区间
 '''
-print("game start!!!!!")
+print("Game Start_____________________")
 
-
+"""
+全局上下文
+"""
 context = Context()
 
+"""
+添加一些processors
+"""
 processors = Processors()
 processors.add(MyInitializeProcessor(context))
 processors.add(MyExecuteProcessor(context))
+processors.add(MyReactiveProcessor(context))
 
+#
 processors.initialize()
 processors.activate_reactive_processors()
 
+"""
+添加一些entities
+"""
+entity = context.create_entity()
+entity.add(Position, 3, 7)
+entity.add(Movable)
 
+"""
+核心循环
+"""
 while running:
 
     start_time = time.time()  # 获取当前时间
@@ -107,7 +119,7 @@ while running:
 processors.clear_reactive_processors()
 processors.tear_down()
 
-print("game over!!!!!")
+print("Game Over_____________________")
 
 
 
