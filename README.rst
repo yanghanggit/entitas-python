@@ -68,7 +68,7 @@ Entity Collector
 
   group = context.get_group(Matcher(Position))
   collector = Collector()
-  collector.add(group, GroupEvent.added)
+  collector.add(group, GroupEvent.ADDED)
 
   # later
 
