@@ -35,6 +35,14 @@ class MyInitializeProcessor(InitializeProcessor):
       
     def initialize(self):
         print('MyInitializeProcessor')
+        """
+        添加一些entities
+        """
+        entity = context.create_entity()
+        entity.add(Position, 3, 7)
+        entity.add(Movable)
+
+
 
 '''
 MyExecuteProcessor
@@ -90,23 +98,21 @@ processors.add(MyExecuteProcessor(context))
 processors.add(MyReactiveProcessor(context))
 
 #
-processors.initialize()
 processors.activate_reactive_processors()
-
-"""
-添加一些entities
-"""
-entity = context.create_entity()
-entity.add(Position, 3, 7)
-entity.add(Movable)
+#processors.initialize()
 
 """
 核心循环
 """
+inited = False
 while running:
 
     start_time = time.time()  # 获取当前时间
 
+    if not inited:
+        inited = True
+        processors.initialize()
+        
     processors.execute()
     processors.cleanup()
 
