@@ -36,4 +36,12 @@ for t in range(context_size):
 
 
 
+# wget https://raw.githubusercontent.com/karpathy/char-rnn/master/data/tinyshakespeare/input.txt
+with open('input.txt', 'r', encoding='utf-8') as f:
+    text = f.read()
 
+print(text)
+
+# 保存文本
+my_text = 'hello world'
+open('my_text.txt', 'w').write(my_text)
