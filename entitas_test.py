@@ -1,5 +1,5 @@
 from collections import namedtuple
-from entitas import Entity, Matcher, Context, Processors, ExecuteProcessor, ReactiveProcessor, GroupEvent, InitializeProcessor
+from entitas import Entity, Matcher, Context, Processors, ExecuteProcessor, ReactiveProcessor, GroupEvent, InitializeProcessor # type: ignore
 import time
 
 
@@ -126,6 +126,3 @@ processors.clear_reactive_processors()
 processors.tear_down()
 
 print("Game Over_____________________")
-
-
-
