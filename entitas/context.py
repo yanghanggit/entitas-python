@@ -4,26 +4,28 @@ from .entity import Entity
 from .matcher import Matcher
 from .group import Group
 from .exceptions import MissingEntity
+from typing import Any, Dict
+from .entity_index import AbstractEntityIndex
 
 
 class Context(object):
     """A context is a data structure managing entities."""
 
-    def __init__(self):
+    def __init__(self) -> None:
 
         #: Entities retained by this context.
-        self._entities = set()
+        self._entities: set[Entity] = set()
 
         #: An object pool to recycle entities.
-        self._reusable_entities = deque()
+        self._reusable_entities: deque[Entity] = deque()
 
         #: Entities counter.
-        self._entity_index = 0
+        self._entity_index: int = 0
 
         #: Dictionary of matchers mapping groups.
-        self._groups = {}
+        self._groups: Dict[Matcher, Group] = {}
 
-        self._entity_indices = {}
+        self._entity_indices: Dict[Any, AbstractEntityIndex] = {}
 
     @property
     def entities(self):
@@ -94,10 +96,10 @@ class Context(object):
         group = self.get_group(Matcher(comp_type))
         return group.single_entity.get(comp_type)
 
-    def add_entity_index(self, entity_index):
+    def add_entity_index(self, entity_index: AbstractEntityIndex):
         self._entity_indices[entity_index.type] = entity_index
 
-    def get_entity_index(self, comp_type):
+    def get_entity_index(self, comp_type: Any) -> AbstractEntityIndex:
         return self._entity_indices[comp_type]
 
     def _comp_added_or_removed(self, entity, comp):

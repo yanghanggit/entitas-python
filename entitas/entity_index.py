@@ -1,16 +1,17 @@
 from abc import ABCMeta, abstractmethod
 from .exceptions import EntitasException
-from typing import Any, Dict, Type
+from typing import Any, Dict, Type, cast
 from .group import Group
+from .entity import Entity
 
 
 class AbstractEntityIndex(metaclass=ABCMeta):
 
-    def __init__(self, comp_type: Type[Any], group: Group, *fields) -> None:
+    def __init__(self, comp_type: Any, group: Group, *fields: Any) -> None:
         self.type = comp_type
         self._group = group
         self._fields = fields
-        self._index = {}
+        self._index: Dict[str, Any] = {}
         self._activate()
 
     def __del__(self) -> None:
@@ -32,43 +33,43 @@ class AbstractEntityIndex(metaclass=ABCMeta):
             for field in self._fields:
                 self._add_entity(getattr(entity.get(self.type), field), entity)
 
-    def _on_entity_added(self, entity, component) -> None:
+    def _on_entity_added(self, entity: Entity, component: Any) -> None:
         for field in self._fields:
             self._add_entity(getattr(component, field), entity)
 
-    def _on_entity_removed(self, entity, component) -> None:
+    def _on_entity_removed(self, entity: Entity, component: Any) -> None:
         for field in self._fields:
             self._remove_entity(getattr(component, field), entity)
 
     @abstractmethod
-    def _add_entity(self, key, entity) -> None:
+    def _add_entity(self, key: str, entity: Entity) -> None:
         pass
 
     @abstractmethod
-    def _remove_entity(self, key, entity) -> None:
+    def _remove_entity(self, key: str, entity: Entity) -> None:
         pass
 
 
 class EntityIndex(AbstractEntityIndex):
 
-    def get_entities(self, key):
+    def get_entities(self, key: str) -> set[Entity]:
         if key not in self._index:
             self._index[key] = set()
-        return self._index[key]
+        return cast(set[Entity], self._index[key])
 
-    def _add_entity(self, key, entity):
+    def _add_entity(self, key: str, entity: Entity) -> None:
         self.get_entities(key).add(entity)
 
-    def _remove_entity(self, key, entity):
+    def _remove_entity(self, key: str, entity: Entity) -> None:
         self.get_entities(key).remove(entity)
 
 
 class PrimaryEntityIndex(AbstractEntityIndex):
 
-    def get_entity(self, key):
-        return self._index[key]
+    def get_entity(self, key: str) -> Entity:
+        return cast(Entity, self._index[key])
 
-    def _add_entity(self, key, entity):
+    def _add_entity(self, key: str, entity: Entity) -> None:
         if key in self._index:
             raise EntitasException(
                 "Entity for key '{key}' already exists!".format(key=key),
@@ -76,5 +77,5 @@ class PrimaryEntityIndex(AbstractEntityIndex):
 
         self._index[key] = entity
 
-    def _remove_entity(self, key, entity):
+    def _remove_entity(self, key: str, entity: Entity) -> None:
         del self._index[key]
