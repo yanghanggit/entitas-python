@@ -1,50 +1,51 @@
 from abc import ABCMeta, abstractmethod
-
 from .exceptions import EntitasException
+from typing import Any, Dict, Type
+from .group import Group
 
 
 class AbstractEntityIndex(metaclass=ABCMeta):
 
-    def __init__(self, comp_type, group, *fields):
+    def __init__(self, comp_type: Type[Any], group: Group, *fields) -> None:
         self.type = comp_type
         self._group = group
         self._fields = fields
         self._index = {}
         self._activate()
 
-    def __del__(self):
+    def __del__(self) -> None:
         self._deactivate()
 
-    def _activate(self):
+    def _activate(self) -> 'AbstractEntityIndex':
         self._group.on_entity_added += self._on_entity_added
         self._group.on_entity_removed += self._on_entity_removed
         self._index_entities()
         return self
 
-    def _deactivate(self):
+    def _deactivate(self) -> None:
         self._group.on_entity_added -= self._on_entity_added
         self._group.on_entity_removed -= self._on_entity_removed
         self._index.clear()
 
-    def _index_entities(self):
+    def _index_entities(self) -> None:
         for entity in self._group.entities:
             for field in self._fields:
                 self._add_entity(getattr(entity.get(self.type), field), entity)
 
-    def _on_entity_added(self, entity, component):
+    def _on_entity_added(self, entity, component) -> None:
         for field in self._fields:
             self._add_entity(getattr(component, field), entity)
 
-    def _on_entity_removed(self, entity, component):
+    def _on_entity_removed(self, entity, component) -> None:
         for field in self._fields:
             self._remove_entity(getattr(component, field), entity)
 
     @abstractmethod
-    def _add_entity(self, key, entity):
+    def _add_entity(self, key, entity) -> None:
         pass
 
     @abstractmethod
-    def _remove_entity(self, key, entity):
+    def _remove_entity(self, key, entity) -> None:
         pass
 
 

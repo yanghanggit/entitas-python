@@ -13,7 +13,6 @@ from .utils import Event
 from .exceptions import (
     EntityNotEnabled, AlreadyAddedComponent, MissingComponent)
 from typing import Any, Dict, Type
-from collections import namedtuple
 
 
 class Entity(object):
