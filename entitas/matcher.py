@@ -4,7 +4,7 @@
 from typing import Any
 from entitas.entity import Entity
 
-def get_expr_repr(expr: str) -> str:
+def get_expr_repr(expr: Any) -> str:
     """
     Returns a string representation of the given expression.
 

@@ -6,7 +6,7 @@ from .utils import Event
 from .exceptions import GroupSingleEntity
 from .matcher import Matcher
 from .entity import Entity
-from typing import Any
+from typing import Any, Optional
 
 
 class GroupEvent(Enum):
@@ -56,7 +56,7 @@ class Group(object):
         return self._entities
 
     @property
-    def single_entity(self) -> Entity:
+    def single_entity(self) -> Optional[Entity]:
         """Returns the only entity in this group.
 
         Returns:
@@ -68,7 +68,8 @@ class Group(object):
         count = len(self._entities)
 
         if count == 1:
-            return min(self._entities)
+            #return min(self._entities)
+            return next(iter(self._entities))
         if count == 0:
             return None
 
