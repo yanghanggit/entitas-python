@@ -14,7 +14,7 @@ frame_duration = 1 / 30  # 每帧所需时间（30帧每秒）
 '''
 全局函数
 '''
-def stop_running():
+def stop_running() -> None:
     global running
     running = False
 
@@ -30,10 +30,10 @@ MyInitializeProcessor
 '''
 class MyInitializeProcessor(InitializeProcessor):
 
-    def __init__(self, context):
+    def __init__(self, context: Context) -> None:
         self._context = context
       
-    def initialize(self):
+    def initialize(self) -> None:
         print('MyInitializeProcessor')
         """
         添加一些entities
@@ -49,11 +49,11 @@ MyExecuteProcessor
 '''
 class MyExecuteProcessor(ExecuteProcessor):
 
-    def __init__(self, context):
+    def __init__(self, context: Context) -> None:
         self._context = context
         self._execute_count = 0
        
-    def execute(self):
+    def execute(self) -> None:
         self._execute_count += 1
         if self._execute_count == 10:
             stop_running()
@@ -63,17 +63,17 @@ MyReactiveProcessor
 '''
 class MyReactiveProcessor(ReactiveProcessor):
 
-    def __init__(self, context):
+    def __init__(self, context: Context) -> None:
         super().__init__(context)
         self._context = context
 
-    def get_trigger(self):
+    def get_trigger(self) -> dict[Matcher, GroupEvent]:
         return {Matcher(Movable): GroupEvent.ADDED}
 
-    def filter(self, entity):
+    def filter(self, entity: Entity) -> bool:
         return entity.has(Movable)
 
-    def react(self, entities):
+    def react(self, entities: list[Entity]) -> None:
         for entity in entities:
             print('x = ', entity.get(Position).x)
             print('y = ', entity.get(Position).y)
