@@ -28,17 +28,17 @@ class Context(object):
         self._entity_indices: Dict[Any, AbstractEntityIndex] = {}
 
     @property
-    def entities(self):
+    def entities(self) -> set[Entity]:
         return self._entities
 
-    def has_entity(self, entity):
+    def has_entity(self, entity: Entity) -> bool:
         """Checks if the context contains this entity.
         :param entity: Entity
         :rtype: bool
         """
         return entity in self._entities
 
-    def create_entity(self):
+    def create_entity(self) -> Entity:
         """Creates an entity. Pop one entity from the pool if it is not
         empty, otherwise creates a new one. Increments the entity index.
         Then adds the entity to the list.
@@ -58,7 +58,7 @@ class Context(object):
 
         return entity
 
-    def destroy_entity(self, entity):
+    def destroy_entity(self, entity: Entity) -> None:
         """Removes an entity from the list and add it to the pool. If
         the context does not contain this entity, a
         :class:`MissingEntity` exception is raised.
@@ -72,7 +72,7 @@ class Context(object):
         self._entities.remove(entity)
         self._reusable_entities.append(entity)
 
-    def get_group(self, matcher):
+    def get_group(self, matcher: Matcher) -> Group:
         """User can ask for a group of entities from the context. The
         group is identified through a :class:`Matcher`.
         :param entity: Matcher
@@ -89,28 +89,30 @@ class Context(object):
 
         return group
 
-    def set_unique_component(self, comp_type, *args):
+    def set_unique_component(self, comp_type: Any, *args: Any) -> None:
         self.create_entity().add(comp_type, *args)
 
-    def get_unique_component(self, comp_type):
+    def get_unique_component(self, comp_type: Any) -> Any:
         group = self.get_group(Matcher(comp_type))
-        return group.single_entity.get(comp_type)
-
-    def add_entity_index(self, entity_index: AbstractEntityIndex):
+        if group.single_entity is not None:
+            return group.single_entity.get(comp_type)  
+        return None
+         
+    def add_entity_index(self, entity_index: AbstractEntityIndex) -> None:
         self._entity_indices[entity_index.type] = entity_index
 
     def get_entity_index(self, comp_type: Any) -> AbstractEntityIndex:
         return self._entity_indices[comp_type]
 
-    def _comp_added_or_removed(self, entity, comp):
+    def _comp_added_or_removed(self, entity: Entity, comp: Any) -> None:
         for matcher in self._groups:
             self._groups[matcher].handle_entity(entity, comp)
 
-    def _comp_replaced(self, entity, previous_comp, new_comp):
+    def _comp_replaced(self, entity: Entity, previous_comp: Any, new_comp: Any) -> None:
         for matcher in self._groups:
             group = self._groups[matcher]
             group.update_entity(entity, previous_comp, new_comp)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return '<Context ({}/{})>'.format(
             len(self._entities), len(self._reusable_entities))
